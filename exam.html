@@ -379,7 +379,16 @@ function nextQuestion() {
 
 function submitExam() {
 
+    const submitBtn = document.getElementById("submitBtn");
+
+    // Prevent multiple submissions
+    if (submitBtn.disabled) return;
+
+    submitBtn.disabled = true;
+    submitBtn.innerText = "Submitting...";
+
     let selected = document.querySelector('input[name="option"]:checked');
+
     if (selected && answers.length < questions.length) {
         answers.push({
             questionId: questions[currentIndex]._id,
@@ -389,7 +398,7 @@ function submitExam() {
 
     window.onbeforeunload = null;
 
-    fetch("https://mech-proctor-backend.onrender.com/submit-exam", {
+    fetch("https://soft-proctor-backend.onrender.com/submit-exam", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ candidateId, answers })
@@ -398,6 +407,11 @@ function submitExam() {
     .then(data => {
         localStorage.clear();
         window.location.href = "index.html";
+    })
+    .catch(err => {
+        alert("Submission failed. Please contact admin.");
+        submitBtn.disabled = false;
+        submitBtn.innerText = "Submit";
     });
 }
 
